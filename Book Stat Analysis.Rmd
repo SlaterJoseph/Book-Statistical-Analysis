@@ -3,6 +3,91 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+Importing Data, Removing null values
 ```{r}
-plot(cars)
+df <- read.csv("Books_Data_Clean.csv")
+df <- df[complete.cases(df), ]
+print(df)
+```
+
+Checking null values are removed
+```{r}
+print(colSums(is.na(df)))
+```
+
+Splitting categorical and numeric columns
+```{r}
+numeric_df <- df[, sapply(df, is.numeric)]
+categorical_df <- df[, !sapply(df, is.numeric)]
+
+print(numeric_df)
+print(categorical_df)
+```
+
+Relabeling genre fiction to just fiction
+```{r}
+old <- c("genre fiction")
+new <- c("fiction")
+categorical_df$genre <- ifelse(categorical_df$genre %in% old, new[match(categorical_df$genre, old)], categorical_df$genre)
+
+print(categorical_df$genre)
+```
+
+
+Creating a correlation matrix to analyze relationships
+```{r}
+corr_matrix <- cor(numeric_df)
+print(corr_matrix)
+```
+
+All Notable Relationships
+1. Moderate Positive -- Gross Sales, Rating Count
+2. Weak Positive -- Revenue, Ratings Count
+3. Strong Negative -- Sales Rank, Ratings Count
+4. Strong Positive -- Revenue, Sales
+5. Weak Negative -- Rank, Sales
+6. Weak Positive -- Price, Revenue
+7. Weak Negative -- Rank, Revenue
+
+Converting categorical data we want to use to numeric data
+```{r}
+genre_mappings <- c("fiction" = 1, "nonfiction" = 2, "children" = 3)
+author_rating_mapping <- c("Novice" = 1, "Intermediate" = 2, "Excellent" = 3, "Famous" = 4)
+
+genre_encoded <- genre_mappings[categorical_df$genre]
+author_rating_encoded <- author_rating_mapping[categorical_df$Author_Rating]
+
+print(genre_encoded)
+print(author_rating_encoded)
+```
+
+Adding the converted categorical data back to the numeric data set
+```{r}
+numeric_df$genre <- genre_encoded
+numeric_df$author_rating <- author_rating_encoded
+
+print(numeric_df)
+```
+
+Running another correlation matrix with the newly added columns
+```{r}
+corr_matrix <- cor(numeric_df)
+print(corr_matrix)
+```
+New Notable Relationships
+Strong Positive -- Book Rating, Author Rating
+Figuring out which numbers correspond to which categorical descriptors
+```{r}
+categorical_
+
+find_values <- function(column, df){
+  unique_vals <- unique(column)
+  for (value in unique_vals) {
+      category <- levels(factor(column))[value]
+      print(paste("Numeric: ", value, " Category: ", category))
+    }  
+  }
+
+
+find_values(author_rating_encoded)
 ```
