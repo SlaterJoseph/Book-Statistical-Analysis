@@ -76,18 +76,98 @@ print(corr_matrix)
 ```
 New Notable Relationships
 Strong Positive -- Book Rating, Author Rating
-Figuring out which numbers correspond to which categorical descriptors
+
+Histograms of the data to see how things lie
 ```{r}
-categorical_
+hist(numeric_df$Book_average_rating, main = "Book Average Rating", xlab="Rating", 
+     ylab = "Amount", col="royalblue")
 
-find_values <- function(column, df){
-  unique_vals <- unique(column)
-  for (value in unique_vals) {
-      category <- levels(factor(column))[value]
-      print(paste("Numeric: ", value, " Category: ", category))
-    }  
-  }
+hist(numeric_df$author_rating, main = "Author Average Rating", xlab="Rating", 
+     ylab = "Amount", col="maroon")
 
+hist(numeric_df$units.sold, main = "Units Sold", xlab="Quanitity", 
+     ylab = "Amount", col="forestgreen")
 
-find_values(author_rating_encoded)
+hist(numeric_df$Book_ratings_count, main = "Rating Count", xlab="Count", 
+     ylab = "Amount", col="azure")
+
+hist(numeric_df$sale.price, main = "Sales Price", xlab="Book Price", 
+     ylab = "Amount", col="gold")
 ```
+
+Scatter Plots of some of the strong relationships
+```{r}
+plot(numeric_df$sales.rank, numeric_df$Book_ratings_count, 
+     main = "Sales Rank vs Rating Count", xlab = "Sales Rank", 
+     ylab = "Rating Count", col= "navy", pch = 16)
+
+plot(numeric_df$publisher.revenue, numeric_df$gross.sales, 
+     main = "Publisher Revenue vs Gross Sales", xlab = "Publisher Revenue", 
+     ylab = "Gross Sales", col= "goldenrod", pch = 16)
+
+plot(numeric_df$gross.sales, numeric_df$Book_ratings_count, 
+     main = "Gross Sales vs Book Rating Count", xlab = "Gross Sales", 
+     ylab = "Rating Count", col= "darkviolet", pch = 16)
+
+plot(numeric_df$Book_average_rating, numeric_df$author_rating, 
+     main = "Average Book Rating vs Author Rating", xlab = "Average Book Rating", 
+     ylab = "Author Rating", col= "thistle", pch = 16)
+```
+
+Analyzing the self published books
+```{r}
+self_published <- subset(numeric_df, numeric_df$publisher.revenue == 0)
+self_published <- self_published[, -which(names(self_published) == "publisher.revenue")]
+print(cor(self_published))
+```
+Strong Positive -- Book Rating, Author Rating
+Moderate Positive -- Rating Count, Gross Sales
+Moderate Negative -- Gross Sales, Sales Rank
+Strong Negative -- Sales Count, Sales Rank
+Small Positive -- Author Rating, Sales Rank
+
+Analyzing books rated better the 4.5
+```{r}
+best_rated <- subset(numeric_df, numeric_df$Book_average_rating >= 4.5)
+print(best_rated)
+print(cor(best_rated))
+```
+
+Every book rated 4.5 or higher has a famous author (4 is corresponding to famous)
+There are no children's books in the top rated, but that can be to due sample
+There was no significant difference in genre of book to best rated
+
+Making a table of the genre to see how the ratio of fiction to nonfiction
+```{r}
+count_table <- table(numeric_df$genre)
+fiction_pct <- count_table["1"] / nrow(numeric_df)
+nonfiction_pct <- count_table["2"] / nrow(numeric_df)
+
+
+best_seller_table <- table(best_rated$genre)
+fiction_pct_b <- best_seller_table["1"] / nrow(best_rated)
+nonfiction_pct_b <- best_seller_table["2"] / nrow(best_rated)
+
+print(paste("Base: Fiction pct: ", fiction_pct, "%, Nonfiction pct: ", nonfiction_pct, "%"))
+print(paste("Best Sellers: Fiction pct: ", fiction_pct_b, "%, Nonfiction pct: ", nonfiction_pct_b, "%"))
+
+```
+Analyzing the top 10% of Books ranked
+```{r}
+top_ten <- subset(numeric_df, numeric_df$sales.rank <= 100)
+print(cor(top_ten))
+```
+Notable Relationships
+Strongly Negative -- Units sold, sales rank
+
+
+Analyzing top 10% of books sold
+```{r}
+count_table <- table(top_ten$author_rating)
+print(count_table)
+```
+
+```{r}
+print(colors())
+```
+
