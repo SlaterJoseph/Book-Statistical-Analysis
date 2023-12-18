@@ -126,6 +126,22 @@ Moderate Negative -- Gross Sales, Sales Rank
 Strong Negative -- Sales Count, Sales Rank
 Small Positive -- Author Rating, Sales Rank
 
+```{r}
+print(mean(self_published$gross.sales))
+print(mean(numeric_df$gross.sales))
+
+print(mean(self_published$sale.price))
+print(mean(numeric_df$sale.price))
+```
+
+Making a Scatter Plot comparing self published to base Data set
+```{r}
+plot(numeric_df$gross.sales, numeric_df$sale.price, col = "steelblue", pch = 16, main = "Comparing Self Published to Base Dataset", xlab = "Gross Sales", ylab = "Sales Price")
+points(self_published$gross.sales, self_published$sale.price, col = "darkviolet", pch = 16)
+legend("topright", legend = c("Base Dataset", "Self Published Dataset"), col = c("steelblue", "darkviolet"), pch = 16)
+```
+
+
 Analyzing books rated better the 4.5
 ```{r}
 best_rated <- subset(numeric_df, numeric_df$Book_average_rating >= 4.5)
@@ -133,9 +149,20 @@ print(best_rated)
 print(cor(best_rated))
 ```
 
-Every book rated 4.5 or higher has a famous author (4 is corresponding to famous)
 There are no children's books in the top rated, but that can be to due sample
 There was no significant difference in genre of book to best rated
+
+Every book rated 4.5 or higher has a famous author (4 is corresponding to famous)
+```{r}
+print(mean(best_rated$author_rating))
+```
+
+```{r}
+plot(best_rated$gross.sales, best_rated$sale.price, xlab = "Gross Sales", ylab = "Sales Price",
+     main = "Best Rated: Gross Sales vs Sale Price", col = "olivedrab", pch = 16)
+```
+
+
 
 Making a table of the genre to see how the ratio of fiction to nonfiction
 ```{r}
@@ -148,24 +175,53 @@ best_seller_table <- table(best_rated$genre)
 fiction_pct_b <- best_seller_table["1"] / nrow(best_rated)
 nonfiction_pct_b <- best_seller_table["2"] / nrow(best_rated)
 
+print(best_seller_table)
+
 print(paste("Base: Fiction pct: ", fiction_pct, "%, Nonfiction pct: ", nonfiction_pct, "%"))
 print(paste("Best Sellers: Fiction pct: ", fiction_pct_b, "%, Nonfiction pct: ", nonfiction_pct_b, "%"))
 
 ```
+Checking gross sales of 4.5 or higher vs all
+```{r}
+print(paste(mean(best_rated$gross.sales)))
+print(paste(mean(numeric_df$gross.sales)))
+```
+
+
 Analyzing the top 10% of Books ranked
 ```{r}
-top_ten <- subset(numeric_df, numeric_df$sales.rank <= 100)
+top_ten <- subset(numeric_df, numeric_df$sales.rank <= 101)
 print(cor(top_ten))
 ```
 Notable Relationships
 Strongly Negative -- Units sold, sales rank
 
-
-Analyzing top 10% of books sold
+Showing the relationship between authors and top 10% ranked books vs all books
 ```{r}
-count_table <- table(top_ten$author_rating)
-print(count_table)
+author_10_count <- table(top_ten$author_rating)
+print(mean(top_ten$author_rating))
+print(author_10_count)
+
+author_count <- table(numeric_df$author_rating)
+print(mean(numeric_df$author_rating))
+print(author_count)
 ```
+
+Compare authors to genres
+```{r}
+plot(numeric_df$author_rating, numeric_df$genre, xlab = "Author Rating", ylab = "Genre (by #)", pch = 16, col = "darkcyan")
+
+author_genre <- table(numeric_df$author_rating, numeric_df$genre)
+print(author_genre)
+
+```
+
+Comparing Author Rating to Gross Sales
+```{r}
+mean_gross_sales_by_author_rating <- aggregate(gross.sales ~ Author_Rating, data = df, FUN = mean, na.rm = TRUE)
+print(mean_gross_sales_by_author_rating)
+```
+
 
 ```{r}
 print(colors())
