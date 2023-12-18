@@ -157,6 +157,7 @@ Every book rated 4.5 or higher has a famous author (4 is corresponding to famous
 print(mean(best_rated$author_rating))
 ```
 
+Checking the Gross Sales to sales price comparison for the best rated books
 ```{r}
 plot(best_rated$gross.sales, best_rated$sale.price, xlab = "Gross Sales", ylab = "Sales Price",
      main = "Best Rated: Gross Sales vs Sale Price", col = "olivedrab", pch = 16)
@@ -188,24 +189,49 @@ print(paste(mean(numeric_df$gross.sales)))
 ```
 
 
-Analyzing the top 10% of Books ranked
 ```{r}
-top_ten <- subset(numeric_df, numeric_df$sales.rank <= 101)
-print(cor(top_ten))
+print(summary(numeric_df$units.sold))
 ```
-Notable Relationships
-Strongly Negative -- Units sold, sales rank
-
-Showing the relationship between authors and top 10% ranked books vs all books
+Visualizing the range for units sold
 ```{r}
-author_10_count <- table(top_ten$author_rating)
-print(mean(top_ten$author_rating))
-print(author_10_count)
+units_sold <- numeric_df$units.sold
+quartiles <- summary(numeric_df$units.sold)
 
-author_count <- table(numeric_df$author_rating)
-print(mean(numeric_df$author_rating))
-print(author_count)
+boxplot(units_sold, main = "Boxplot of Units Sold", ylab = "Unit Sold",
+        col = "firebrick", pch = 16, at=0)
+
+text(1, quartiles[2], paste("Q1:", round(quartiles[2], 2)), pos = 4)
+text(1, quartiles[3], paste("Q2 (Median):", round(quartiles[3], 2)), pos = 4)
+text(1, quartiles[4], paste("Q3:", round(quartiles[4], 2)), pos = 4)
 ```
+Removing outliers for units sold
+```{r}
+col <- "units.sold"
+
+Q1 <- quantile(numeric_df[[col]], 0.25)
+Q3 <- quantile(numeric_df[[col]], 0.75)
+IQR_value <- Q3 - Q1
+
+lower_bound <- Q1 - 1.5 * IQR_value
+upper_bound <- Q3 + 1.5 * IQR_value
+
+no_outliers_units_sold <- df[df[[col]] >= lower_bound & df[[col]] <= upper_bound, ]
+summary(no_outliers_units_sold$units.sold)
+```
+Box plot of the units sold without outliers
+```{r}
+units_sold <- no_outliers_units_sold$units.sold
+quartiles <- summary(no_outliers_units_sold$units.sold)
+
+boxplot(units_sold, main = "Boxplot of Units Sold", ylab = "Unit Sold",
+        col = "gainsboro", pch = 16, at=0)
+
+text(1, quartiles[2], paste("Q1:", round(quartiles[2], 2)), pos = 4)
+text(1, quartiles[3], paste("Q2 (Median):", round(quartiles[3], 2)), pos = 4)
+text(1, quartiles[4], paste("Q3:", round(quartiles[4], 2)), pos = 4)
+```
+
+
 
 Compare authors to genres
 ```{r}
